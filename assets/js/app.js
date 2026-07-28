@@ -87,9 +87,12 @@ function startBreakingScroll(){
     clearInterval(breakingScrollTimer);
     if(!breakingAutoScroll)return;
     breakingScrollTimer=setInterval(()=>{
-        if(t.scrollLeft>=t.scrollWidth-t.clientWidth-2)t.scrollLeft=0;
-        else t.scrollLeft+=1;
-    },40);
+        const card=t.querySelector('.breaking-card');
+        if(!card)return;
+        const step=card.offsetWidth+8; // card + gap
+        if(t.scrollLeft>=t.scrollWidth-t.clientWidth-step)t.scrollTo({left:0,behavior:'smooth'});
+        else t.scrollBy({left:step,behavior:'smooth'});
+    },3000);
 }
 function toggleBreakingScroll(){
     breakingAutoScroll=!breakingAutoScroll;
