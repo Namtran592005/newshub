@@ -336,7 +336,23 @@ function detect_region($user_city) {
     return '';
 }
 
-// ===== MAIN AGGREGATOR =====
+// ===== CACHE-ONLY READER (no fetching) =====
+function load_cached_data() {
+    global $CACHE_FILE;
+    if (file_exists($CACHE_FILE)) {
+        $data = json_decode(file_get_contents($CACHE_FILE), true);
+        if ($data && isset($data['articles'])) return $data;
+    }
+    return [
+        'articles'=>[], 'breaking'=>[], 'source_stats'=>[], 'category_stats'=>[],
+        'top_keywords'=>[], 'timeline'=>[], 'trends'=>[], 'finance'=>[],
+        'source_types'=>[], 'total'=>0, 'updated_at'=>time(),
+        'weather'=>[], 'social_trends'=>[], 'world_clocks'=>get_world_clocks(),
+        'user_city'=>'', 'user_region'=>'',
+    ];
+}
+
+// ===== MAIN AGGREGATOR (for cron) =====
 function fetch_all_news($user_city = '') {
     global $RSS_SOURCES;
     $cached = get_cached_news();

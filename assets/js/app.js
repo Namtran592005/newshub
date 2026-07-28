@@ -251,11 +251,18 @@ function renderAllCharts(data){
 function updateTimestamp(ts){if(ts)document.getElementById('updated-at').innerHTML='<i class="fa-regular fa-clock"></i> '+new Date(ts*1000).toLocaleString('vi-VN');}
 
 // ===== API =====
-async function fetchData(action='all'){try{const loc=userCity?`&location=${encodeURIComponent(userCity)}`:'';const r=await fetch(`${API_BASE}?action=${action}${loc}`,{cache:'no-store'});if(!r.ok)throw Error('HTTP '+r.status);return await r.json();}catch(e){console.error('Fetch:',e);return null;}}
+async function fetchData(action='all'){try{const loc=userCity?`&location=${encodeURIComponent(userCity)}`:'';const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),10000);const r=await fetch(`${API_BASE}?action=${action}${loc}`,{cache:'no-store',signal:controller.signal});clearTimeout(timer);if(!r.ok)throw Error('HTTP '+r.status);return await r.json();}catch(e){console.error('Fetch:',e);return null;}}
 
 async function loadDashboard(){
     const data=await fetchData('all');
-    if(!data)return;
+    if(!data){
+        document.querySelector('.ticker-track').innerHTML='<span class="ticker-placeholder">Không thể kết nối máy chủ. Vui lòng thử lại sau.</span>';
+        document.querySelector('#total-articles').textContent='0';
+        return;
+    }
+    if(!data.articles||!data.articles.length){
+        document.querySelector('.ticker-track').innerHTML='<span class="ticker-placeholder">Đang chờ dữ liệu từ cronjob... Tự động làm mới sau 60s.</span>';
+    }
     allData=data;state.articles=data.articles||[];
     renderStats(data);renderBreaking(data.breaking);renderTicker(data.articles);
     initFilters(data);applyFilters();

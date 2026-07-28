@@ -18,62 +18,118 @@ Dashboard tin tức thời gian thực, tối giản, kỹ thuật. Tự động
 - **Theme sáng/tối** — toggle, lưu localStorage, mặc định dark
 - **Đếm ngược tự động** — countdown đến lần làm mới tiếp theo (60s)
 - **View modes** — `?view=all|news|finance|charts|breaking` — mỗi tab màn hình riêng
-- **TV Trực tiếp** — `tv.php` — xem VTV1-3, THVL1-2, HTV7/9, VTC1, H1/H2, ĐN1, CT1, VTVcab1 — chế độ grid/single
+- **Danh sách kênh TV** — `tv.php` — 13 kênh VTV1-3, THVL1-2, HTV7/9, VTC1, H1/H2, ĐN1, CT1, VTVcab1 — click vào kênh để mở trang chính thức trên tab mới
 - **Responsive** — 3 breakpoint (1100/768/480px)
-- **Tự động cập nhật** mỗi 60 giây, cache backend 5 phút
+- **Tự động cập nhật** — cron job (Ofelia) thu thập dữ liệu mỗi 5 phút, dashboard chỉ đọc cache, không fetch khi người dùng truy cập
+- **Chịu tải cao** — trang luôn hoạt động kể cả không ai truy cập; zero dependency vào trình duyệt người dùng
 
 ## Yêu cầu
 
-- PHP 8.0+ (với `simplexml`, `mbstring`, `json`)
-- Web server (Caddy, Nginx, Apache) hoặc Docker
-- Kết nối internet để fetch RSS & dữ liệu tài chính
+- Docker & Docker Compose
+- Kết nối internet để cron job fetch RSS & dữ liệu tài chính
 
 ## Cài đặt
 
 ```bash
 # 1. Clone
-git clone https://github.com/your-username/newshub.git
+git clone https://github.com/Namtran592005/newshub.git
 cd newshub
 
-# 2. Cấp quyền ghi cache
-chmod 755 cache/
-
-# 3. (Docker) Khởi động
+# 2. Khởi động toàn bộ hệ thống
 docker compose up -d
 
-# 4. Truy cập
-# http://localhost/NewsHub/
+# 3. Truy cập
+# http://localhost:8080/
 ```
+
+Lần đầu chạy, cron job sẽ tự động thu thập dữ liệu trong vòng 1-2 phút. Trang sẽ hiển thị "Đang chờ dữ liệu từ cronjob..." cho đến khi có cache.
+
+### Cấu hình port
+
+Mặc định chạy port 8080. Đổi port bằng biến môi trường:
+```bash
+PORT=80 docker compose up -d
+```
+
+### Chạy thủ công (không Docker)
+
+```bash
+# Yêu cầu PHP 8.0+ với mbstring, simplexml
+php -S 0.0.0.0:8080
+# Sau đó chạy cron thủ công:
+php cron.php
+# Hoặc cấu hình crontab:
+# */5 * * * * php /path/to/newshub/cron.php
+```
+
+## Kiến trúc
+
+Hệ thống hoạt động theo mô hình **cronjob-driven**:
+
+```
+┌─────────────────┐     ┌──────────────┐     ┌──────────────────┐
+│   Ofelia (cron) │────▶│  PHP-FPM     │────▶│  Cache JSON      │
+│   @every 5m     │     │  cron.php    │     │  (news_cache)    │
+└─────────────────┘     └──────────────┘     └──────────────────┘
+                                                    │
+┌──────────────┐     ┌──────────────┐               │
+│  Trình duyệt │────▶│  Caddy       │────▶  api.php  │
+│  (index.php) │     │  (web server)│      (đọc cache)│
+└──────────────┘     └──────────────┘               ▼
+                                              ┌──────────────────┐
+                                              │  Dữ liệu luôn    │
+                                              │  sẵn sàng, ko   │
+                                              │  fetch RSS khi   │
+                                              │  user truy cập   │
+                                              └──────────────────┘
+```
+
+- `cron.php` — xoá cache cũ, fetch lại từ RSS/tài chính/thời tiết, ghi cache
+- `api.php` — chỉ đọc cache, KHÔNG BAO GIỜ fetch trực tiếp
+- Trang luôn hoạt động ngay cả khi không ai truy cập (cron duy trì cache)
 
 ## Cấu trúc thư mục
 
 ```
 NewsHub/
 ├── index.php              # Dashboard chính
-├── api.php                # API endpoint JSON
-├── tv.php                 # Trang xem TV trực tiếp
+├── api.php                # API endpoint JSON (chỉ đọc cache)
+├── cron.php               # Cron job entrypoint (Ofelia gọi)
+├── tv.php                 # Trang danh sách kênh truyền hình
 ├── worldclock.php         # Đồng hồ thế giới (real-time)
 ├── trends.php             # Xu hướng mạng xã hội
+├── docker-compose.yml     # Docker Compose (Caddy + PHP + Ofelia)
+├── Dockerfile             # PHP-FPM với mbstring, simplexml
+├── Caddyfile              # Cấu hình Caddy web server
 ├── includes/
 │   └── functions.php      # RSS parser, cache, finance, weather, trends
 ├── assets/
 │   ├── css/style.css      # Dark/light theme, responsive, TV, weather, clocks
 │   └── js/app.js          # Charts, filters, pagination, ticker, geolocation
-└── cache/                 # Cache JSON (tự động tạo)
+├── cache/                 # Cache JSON (do cron job tạo)
+└── logs/                  # Caddy logs
 ```
 
 ## API endpoints
 
+Tất cả endpoint chỉ đọc cache (do cron job tạo), không fetch RSS.
+
 | Endpoint | Mô tả |
 |----------|-------|
 | `api.php?action=all` | Toàn bộ dữ liệu (articles, stats, finance, weather, trends, clocks) |
-| `api.php?action=refresh` | Xoá cache, fetch lại từ RSS |
+| `api.php?action=refresh` | Reload từ cache hiện tại (không fetch) |
 | `api.php?action=stats` | Chỉ thống kê + tài chính + thời tiết |
 | `api.php?action=finance` | Chỉ dữ liệu thị trường |
 | `api.php?action=weather` | Chỉ dữ liệu thời tiết |
 | `api.php?action=social` | Chỉ xu hướng mạng xã hội |
 | `api.php?action=clocks` | Chỉ đồng hồ thế giới |
 | Tham số `&location=Hanoi` | Gửi vị trí người dùng để nhận thời tiết + ưu tiên khu vực |
+
+### Cron job
+
+| Endpoint | Mô tả |
+|----------|-------|
+| `php cron.php` | Regenerate toàn bộ cache (gọi nội bộ, không public) |
 
 ## View modes
 
@@ -91,4 +147,4 @@ index.php?view=breaking  # Tin nóng full screen
 - **Tài chính**: Yahoo Finance (^VNINDEX, ^HNX, GC=F, SI=F, BZ=F, CL=F, USDVND=X), SJC, Petrolimex
 - **Xu hướng**: Google Trends Vietnam, YouTube (Invidious API), TikTok (scrape + fallback), Facebook/Threads
 - **Thời tiết**: wttr.in — Hà Nội, HCM, Đà Nẵng, Cần Thơ + tự động theo vị trí
-- **TV**: VTV, THVL, HTV, VTC, Hanoitv, Danangtv, Canthotv, VTVcab
+- **TV**: VTV, THVL, HTV, VTC, Hanoitv, Danangtv, Canthotv, VTVcab (chuyển hướng đến trang chính thức)

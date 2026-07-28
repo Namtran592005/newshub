@@ -1,0 +1,32 @@
+services:
+  caddy:
+    image: caddy:alpine
+    ports:
+      - "${PORT:-8080}:8080"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - .:/app
+    depends_on:
+      - php
+    restart: unless-stopped
+
+  php:
+    build: .
+    container_name: newshub-php
+    volumes:
+      - .:/app
+    restart: unless-stopped
+
+  ofelia:
+    image: mcuadros/ofelia:latest
+    container_name: newshub-ofelia
+    depends_on:
+      - php
+    command: daemon --docker
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    labels:
+      ofelia.job-run.fetch-news.schedule: "@every 5m"
+      ofelia.job-run.fetch-news.command: "php /app/cron.php"
+      ofelia.job-run.fetch-news.container: "newshub-php"
+    restart: unless-stopped

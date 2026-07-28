@@ -10,19 +10,22 @@ $user_city = $_GET['location'] ?? '';
 
 switch ($action) {
     case 'refresh':
-        foreach (['news','finance','weather','social'] as $f) {
-            $p = __DIR__ . "/cache/{$f}_cache.json";
-            if (file_exists($p)) unlink($p);
-        }
-        $data = fetch_all_news($user_city);
+        $data = load_cached_data();
+        $data['_refreshed'] = time();
         break;
 
     case 'weather':
-        $data = ['weather' => fetch_weather($user_city)];
+        $cached = load_cached_data();
+        $data = ['weather' => $cached['weather']];
         break;
 
     case 'social':
-        $data = ['social_trends' => fetch_social_trends()];
+        $cache = __DIR__ . '/cache/social_cache.json';
+        if (file_exists($cache)) {
+            $data = ['social_trends' => json_decode(file_get_contents($cache), true)];
+        } else {
+            $data = ['social_trends' => ['youtube'=>[],'tiktok'=>[],'facebook'=>[],'google'=>[]]];
+        }
         break;
 
     case 'clocks':
@@ -30,11 +33,16 @@ switch ($action) {
         break;
 
     case 'finance':
-        $data = ['finance' => fetch_finance()];
+        $cache = __DIR__ . '/cache/finance_cache.json';
+        if (file_exists($cache)) {
+            $data = ['finance' => json_decode(file_get_contents($cache), true)];
+        } else {
+            $data = ['finance' => ['indices'=>[],'gold'=>[],'currency'=>[],'commodities'=>[],'petrol'=>[]]];
+        }
         break;
 
     case 'stats':
-        $d = fetch_all_news($user_city);
+        $d = load_cached_data();
         $data = [
             'total' => $d['total'], 'source_stats' => $d['source_stats'],
             'category_stats' => $d['category_stats'], 'top_keywords' => $d['top_keywords'],
@@ -47,7 +55,12 @@ switch ($action) {
 
     case 'all':
     default:
-        $data = fetch_all_news($user_city);
+        $data = load_cached_data();
+        if ($user_city) {
+            $data['weather'] = fetch_weather($user_city);
+            $data['user_city'] = $user_city;
+            $data['user_region'] = detect_region($user_city);
+        }
         break;
 }
 
