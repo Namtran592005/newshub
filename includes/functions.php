@@ -3,7 +3,7 @@ date_default_timezone_set('Asia/Ho_Chi_Minh');
 
 $CACHE_DIR  = __DIR__ . '/../cache';
 $CACHE_FILE = $CACHE_DIR . '/news_cache.json';
-$CACHE_TTL  = 300;
+$CACHE_TTL  = 55;
 
 $RSS_SOURCES = [
     ['name' => 'VnExpress',   'url' => 'https://vnexpress.net/rss/tin-moi-nhat.rss',               'lang' => 'vi', 'type' => 'news', 'region' => 'north'],

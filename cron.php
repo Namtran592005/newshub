@@ -9,13 +9,7 @@ require_once __DIR__ . '/includes/functions.php';
 
 $start = microtime(true);
 
-// Clear all cache to force regeneration
-$cacheDir = __DIR__ . '/cache';
-foreach (glob($cacheDir . '/*.json') as $f) {
-    if (basename($f) !== '.gitkeep') unlink($f);
-}
-
-// Regenerate all data (this calls fetch_weather, fetch_finance, fetch_social_trends internally)
+// fetch_all_news tự động kiểm tra TTL (55s) và regenerate nếu cần
 $data = fetch_all_news();
 
 $elapsed = round(microtime(true) - $start, 2);
