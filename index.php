@@ -33,9 +33,6 @@
         <div class="header-right">
             <span class="countdown" id="countdown"><i class="fa-regular fa-hourglass-half"></i> <span id="countdown-value">60</span>s</span>
             <span class="updated-at" id="updated-at"><i class="fa-regular fa-clock"></i> Đang tải...</span>
-            <button class="btn-theme" id="btn-theme" type="button" title="Chế độ sáng/tối">
-                <i class="fa-regular fa-sun"></i>
-            </button>
             <button class="btn-refresh" type="button"><i class="fa-solid fa-rotate"></i> Làm mới</button>
         </div>
     </header>

@@ -1,8 +1,9 @@
 <?php
 require_once __DIR__ . '/includes/functions.php';
-$data = fetch_all_news();
-$social = $data['social_trends'] ?? fetch_social_trends();
-$keywords = $data['top_keywords'] ?? [];
+$data = load_cached_data();
+$social = $data['social_trends'];
+if (empty($social['youtube']) && empty($social['tiktok'])) $social = fetch_social_trends();
+$keywords = $data['top_keywords'];
 ?>
 <!DOCTYPE html>
 <html lang="vi" data-theme="dark">

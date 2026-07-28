@@ -35,15 +35,6 @@ function escHtml(s){if(!s)return'';const d=document.createElement('div');d.textC
 function truncate(s,m){if(!s)return'';return s.length>m?s.slice(0,m)+'…':s;}
 function numFormat(n){return(n||0).toLocaleString('vi-VN')}
 
-// ===== THEME =====
-(function(){const s=localStorage.getItem('newshub-theme');if(s)document.documentElement.setAttribute('data-theme',s);})();
-function toggleTheme(){
-    const h=document.documentElement,cur=h.getAttribute('data-theme'),nxt=cur==='light'?'dark':'light';
-    h.setAttribute('data-theme',nxt);localStorage.setItem('newshub-theme',nxt);
-    document.querySelector('#btn-theme i').className=nxt==='light'?'fa-regular fa-moon':'fa-regular fa-sun';
-    if(allData)renderAllCharts(allData);
-}
-
 // ===== FILTERS =====
 let filtInit=false;
 function initFilters(data){
@@ -357,9 +348,6 @@ function detectUserLocation(){
 
 // ===== INIT =====
 document.addEventListener('DOMContentLoaded',()=>{
-    const th=document.documentElement.getAttribute('data-theme');
-    document.querySelector('#btn-theme i').className=th==='light'?'fa-regular fa-moon':'fa-regular fa-sun';
-    document.querySelector('#btn-theme').addEventListener('click',toggleTheme);
     detectUserLocation();
     startCountdown();
     document.querySelector('.btn-refresh')?.addEventListener('click',handleRefresh);

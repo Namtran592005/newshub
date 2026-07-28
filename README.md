@@ -15,7 +15,7 @@ Dashboard tin tức thời gian thực, tối giản, kỹ thuật. Tự động
 - **Xu hướng mạng xã hội** — `trends.php` — Google Trends VN, YouTube thịnh hành, TikTok hashtag, Facebook/Threads
 - **Xu hướng Google** — top từ khoá tìm kiếm tại Việt Nam
 - **Định vị khu vực** — tự động phát hiện vị trí → thêm thời tiết thành phố của bạn, ưu tiên tin tức từ nguồn địa phương (Bắc/Nam/Trung)
-- **Theme sáng/tối** — toggle, lưu localStorage, mặc định dark
+- **Theme tối** — dark mode duy nhất
 - **Đếm ngược tự động** — countdown đến lần làm mới tiếp theo (60s)
 - **View modes** — `?view=all|news|finance|charts|breaking` — mỗi tab màn hình riêng
 - **Danh sách kênh TV** — `tv.php` — 13 kênh VTV1-3, THVL1-2, HTV7/9, VTC1, H1/H2, ĐN1, CT1, VTVcab1 — click vào kênh để mở trang chính thức trên tab mới
