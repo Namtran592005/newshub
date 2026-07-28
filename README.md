@@ -26,37 +26,28 @@ Dashboard tin tức thời gian thực, tối giản, kỹ thuật. Tự động
 ## Yêu cầu
 
 - Docker & Docker Compose
+- Web server (Caddy, Nginx, Apache) có PHP 8.0+ với `mbstring`, `simplexml`
 - Kết nối internet để cron job fetch RSS & dữ liệu tài chính
 
 ## Cài đặt
 
 ```bash
-# 1. Clone
+# 1. Clone vào thư mục web server
 git clone https://github.com/Namtran592005/newshub.git
 cd newshub
 
-# 2. Khởi động toàn bộ hệ thống
+# 2. Khởi động Ofelia + PHP CLI (cron job)
 docker compose up -d
 
-# 3. Truy cập
-# http://localhost:8080/
+# 3. Truy cập qua web server
+# http://localhost/newshub/
 ```
 
 Lần đầu chạy, cron job sẽ tự động thu thập dữ liệu trong vòng 1-2 phút. Trang sẽ hiển thị "Đang chờ dữ liệu từ cronjob..." cho đến khi có cache.
 
-### Cấu hình port
-
-Mặc định chạy port 8080. Đổi port bằng biến môi trường:
-```bash
-PORT=80 docker compose up -d
-```
-
 ### Chạy thủ công (không Docker)
 
 ```bash
-# Yêu cầu PHP 8.0+ với mbstring, simplexml
-php -S 0.0.0.0:8080
-# Sau đó chạy cron thủ công:
 php cron.php
 # Hoặc cấu hình crontab:
 # */5 * * * * php /path/to/newshub/cron.php
@@ -68,20 +59,14 @@ Hệ thống hoạt động theo mô hình **cronjob-driven**:
 
 ```
 ┌─────────────────┐     ┌──────────────┐     ┌──────────────────┐
-│   Ofelia (cron) │────▶│  PHP-FPM     │────▶│  Cache JSON      │
+│   Ofelia (cron) │────▶│  PHP CLI     │────▶│  Cache JSON      │
 │   @every 5m     │     │  cron.php    │     │  (news_cache)    │
 └─────────────────┘     └──────────────┘     └──────────────────┘
                                                     │
-┌──────────────┐     ┌──────────────┐               │
-│  Trình duyệt │────▶│  Caddy       │────▶  api.php  │
-│  (index.php) │     │  (web server)│      (đọc cache)│
-└──────────────┘     └──────────────┘               ▼
-                                              ┌──────────────────┐
-                                              │  Dữ liệu luôn    │
-                                              │  sẵn sàng, ko   │
-                                              │  fetch RSS khi   │
-                                              │  user truy cập   │
-                                              └──────────────────┘
+┌──────────────┐                                    │
+│  Trình duyệt │────▶  api.php  (đọc cache) ────────┘
+│  (index.php) │
+└──────────────┘
 ```
 
 - `cron.php` — xoá cache cũ, fetch lại từ RSS/tài chính/thời tiết, ghi cache
@@ -98,9 +83,7 @@ NewsHub/
 ├── tv.php                 # Trang danh sách kênh truyền hình
 ├── worldclock.php         # Đồng hồ thế giới (real-time)
 ├── trends.php             # Xu hướng mạng xã hội
-├── docker-compose.yml     # Docker Compose (Caddy + PHP + Ofelia)
-├── Dockerfile             # PHP-FPM với mbstring, simplexml
-├── Caddyfile              # Cấu hình Caddy web server
+├── docker-compose.yml     # Docker Compose (PHP CLI + Ofelia cron)
 ├── includes/
 │   └── functions.php      # RSS parser, cache, finance, weather, trends
 ├── assets/

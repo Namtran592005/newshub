@@ -1,20 +1,11 @@
 services:
-  caddy:
-    image: caddy:alpine
-    ports:
-      - "${PORT:-8080}:8080"
-    volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile
-      - .:/app
-    depends_on:
-      - php
-    restart: unless-stopped
-
   php:
-    build: .
+    image: php:8.2-cli-alpine
     container_name: newshub-php
     volumes:
       - .:/app
+    working_dir: /app
+    command: ["tail", "-f", "/dev/null"]
     restart: unless-stopped
 
   ofelia:
