@@ -142,16 +142,16 @@ echo '</div>';
 
 // ===== 5. DOCKER / CRON =====
 echo '<div class="card"><h2>5. Docker & Cron</h2>';
-$hasDocker = file_exists('/.dockerenv') || (PHP_SAPI === 'cli' && getenv('DOCKER'));
 $inPhpContainer = file_exists('/.dockerenv');
 status(true, 'Container PHP', $inPhpContainer ? 'Chạy trong Docker' : 'Chạy ngoài Docker (host)');
 if ($inPhpContainer) {
-    $cronRunning = trim(`ps aux | grep -c '[o]fel' 2>/dev/null`) > 0;
-    status($cronRunning, 'Ofelia (cron)', $cronRunning ? 'Đang chạy' : 'Không chạy', 'warn');
+    $proc = trim(`ps aux 2>/dev/null | grep 'cron.php' | grep -v grep`);
+    $cronRunning = !empty($proc);
+    status($cronRunning, 'Cron loop (cron.php)', $cronRunning ? 'Đang chạy (sleep 60s)' : 'Không chạy', 'warn');
 } else {
-    // Check host crontab
-    $cronJob = trim(`crontab -l 2>/dev/null | grep -c 'cron.php'`) > 0;
-    status($cronJob, 'Crontab', $cronJob ? 'Đã cấu hình' : 'Chưa cấu hình cron', 'warn');
+    $cronJob = trim(`crontab -l 2>/dev/null | grep -c 'cron.php'`) > 0 ||
+               file_exists('/etc/periodic/1min/cron.php');
+    status($cronJob, 'Crontab', $cronJob ? 'Đã cấu hình' : 'Chưa cấu hình cron — chạy thủ công: php cron.php', 'warn');
 }
 echo '</div>';
 

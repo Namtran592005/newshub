@@ -36,7 +36,7 @@ Dashboard tin tức thời gian thực, tối giản, kỹ thuật. Tự động
 git clone https://github.com/Namtran592005/newshub.git
 cd newshub
 
-# 2. Khởi động Ofelia + PHP CLI (cron job)
+# 2. Khởi động PHP CLI (tự động chạy cron mỗi 60s)
 docker compose up -d
 
 # 3. Truy cập qua web server
@@ -58,10 +58,10 @@ php cron.php
 Hệ thống hoạt động theo mô hình **cronjob-driven**:
 
 ```
-┌─────────────────┐     ┌──────────────┐     ┌──────────────────┐
-│   Ofelia (cron) │────▶│  PHP CLI     │────▶│  Cache JSON      │
-│   @every 5m     │     │  cron.php    │     │  (news_cache)    │
-└─────────────────┘     └──────────────┘     └──────────────────┘
+┌────────────────────────┐     ┌──────────────────┐
+│  PHP CLI (sleep 60s)   │────▶│  Cache JSON      │
+│  while true → cron.php │     │  (news_cache)    │
+└────────────────────────┘     └──────────────────┘
                                                     │
 ┌──────────────┐                                    │
 │  Trình duyệt │────▶  api.php  (đọc cache) ────────┘
@@ -83,7 +83,7 @@ NewsHub/
 ├── tv.php                 # Trang danh sách kênh truyền hình
 ├── worldclock.php         # Đồng hồ thế giới (real-time)
 ├── trends.php             # Xu hướng mạng xã hội
-├── docker-compose.yml     # Docker Compose (PHP CLI + Ofelia cron)
+├── docker-compose.yml     # Docker Compose (PHP CLI + cron loop 60s)
 ├── includes/
 │   └── functions.php      # RSS parser, cache, finance, weather, trends
 ├── assets/
@@ -112,7 +112,7 @@ Tất cả endpoint chỉ đọc cache (do cron job tạo), không fetch RSS.
 
 | Endpoint | Mô tả |
 |----------|-------|
-| `php cron.php` | Regenerate toàn bộ cache (gọi nội bộ, không public) |
+| `php cron.php` | Regenerate toàn bộ cache (cron loop trong container gọi mỗi 60s) |
 
 ## View modes
 

@@ -5,19 +5,13 @@ services:
     volumes:
       - .:/app
     working_dir: /app
-    command: ["tail", "-f", "/dev/null"]
-    restart: unless-stopped
-
-  ofelia:
-    image: mcuadros/ofelia:latest
-    container_name: newshub-ofelia
-    depends_on:
-      - php
-    command: daemon --docker
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    labels:
-      ofelia.job-run.fetch-news.schedule: "@every 1m"
-      ofelia.job-run.fetch-news.command: "php /app/cron.php"
-      ofelia.job-run.fetch-news.container: "newshub-php"
+    command:
+      - /bin/sh
+      - -c
+      - |
+        while true; do
+          echo "[$$(date '+%Y-%m-%d %H:%M:%S')] Running cron..."
+          php /app/cron.php
+          sleep 60
+        done
     restart: unless-stopped
