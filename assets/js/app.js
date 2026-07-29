@@ -6,7 +6,6 @@ let allData = null;
 let breakingScrollTimer = null;
 let breakingAutoScroll = true;
 let charts = {};
-let userCity = '';
 
 const state = {
     articles: [], filtered: [], currentPage: 1, perPage: PER_PAGE,
@@ -245,7 +244,7 @@ function renderAllCharts(data){
 function updateTimestamp(ts){if(ts)document.getElementById('updated-at').innerHTML='<i class="fa-regular fa-clock"></i> '+new Date(ts*1000).toLocaleString('vi-VN');}
 
 // ===== API =====
-async function fetchData(action='all'){try{const loc=userCity?`&location=${encodeURIComponent(userCity)}`:'';const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),10000);const r=await fetch(`${API_BASE}?action=${action}${loc}`,{cache:'no-store',signal:controller.signal});clearTimeout(timer);if(!r.ok)throw Error('HTTP '+r.status);return await r.json();}catch(e){console.error('Fetch:',e);return null;}}
+async function fetchData(action='all'){try{const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),10000);const r=await fetch(`${API_BASE}?action=${action}`,{cache:'no-store',signal:controller.signal});clearTimeout(timer);if(!r.ok)throw Error('HTTP '+r.status);return await r.json();}catch(e){console.error('Fetch:',e);return null;}}
 
 async function loadDashboard(){
     const data=await fetchData('all');
@@ -304,10 +303,9 @@ function renderWeather(weather) {
     const row = document.getElementById('weather-row');
     if (!weather || !weather.length) { row.innerHTML = ''; return; }
     row.innerHTML = weather.map(c => {
-        const isUser = c.user_location;
         const icon = c.icon ? `<img src="${c.icon}" alt="${escHtml(c.desc)}">` : `<i class="fa-solid fa-${getWeatherIcon(c.code)}"></i>`;
         const fc = (c.forecast || []).slice(0,4).map(f => `<div class="weather-fc"><div class="fc-day">${f.date ? f.date.slice(5) : ''}</div><div class="fc-temp">${f.max}°</div></div>`).join('');
-        return `<div class="weather-card${isUser?' user-location':''}">
+        return `<div class="weather-card">
             <div class="weather-icon">${icon}</div>
             <div class="weather-info">
                 <div class="weather-city">${escHtml(c.city)}</div>
@@ -325,29 +323,8 @@ function getWeatherIcon(code) {
     return map[code] || 'cloud';
 }
 
-// ===== USER LOCATION =====
-function detectUserLocation(){
-    // Chỉ chạy geolocation nếu đang HTTPS (trên HTTP các trình duyệt từ chối)
-    if (!navigator.geolocation || location.protocol !== 'https:') return;
-    navigator.geolocation.getCurrentPosition(
-        pos => {
-            const lat=pos.coords.latitude, lng=pos.coords.longitude;
-            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&accept-language=vi`)
-                .then(r=>r.json())
-                .then(d=>{
-                    const addr=d?.address;
-                    userCity=addr?.city||addr?.town||addr?.county||addr?.state||'';
-                })
-                .catch(()=>{});
-        },
-        () => {},
-        { timeout: 5000, enableHighAccuracy: false }
-    );
-}
-
 // ===== INIT =====
 document.addEventListener('DOMContentLoaded',()=>{
-    detectUserLocation();
     loadDashboard();
     startCountdown();
     document.querySelector('.btn-refresh')?.addEventListener('click',handleRefresh);

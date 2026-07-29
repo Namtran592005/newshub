@@ -6,25 +6,21 @@ $CACHE_FILE = $CACHE_DIR . '/news_cache.json';
 $CACHE_TTL  = 55;
 
 $RSS_SOURCES = [
-    ['name' => 'VnExpress',   'url' => 'https://vnexpress.net/rss/tin-moi-nhat.rss',               'lang' => 'vi', 'type' => 'news', 'region' => 'north'],
-    ['name' => 'Tuổi Trẻ',    'url' => 'https://tuoitre.vn/rss/tin-moi-nhat.rss',                  'lang' => 'vi', 'type' => 'news', 'region' => 'south'],
-    ['name' => 'Dân trí',     'url' => 'https://dantri.com.vn/rss/tin-moi-nhat.rss',               'lang' => 'vi', 'type' => 'news', 'region' => 'north'],
-    ['name' => 'Vietnamnet',  'url' => 'https://vietnamnet.vn/rss/tin-moi-nhat.rss',               'lang' => 'vi', 'type' => 'news', 'region' => 'north'],
-    ['name' => 'Thanh Niên',  'url' => 'https://thanhnien.vn/rss/trang-chu.rss',                   'lang' => 'vi', 'type' => 'news', 'region' => 'south'],
-    ['name' => 'Znews',       'url' => 'https://znews.vn/rss/tin-moi-nhat.rss',                   'lang' => 'vi', 'type' => 'news', 'region' => 'north'],
-    ['name' => 'VietNamPlus', 'url' => 'https://www.vietnamplus.vn/rss/tin-moi.rss',               'lang' => 'vi', 'type' => 'news', 'region' => 'north'],
-    ['name' => '24h',         'url' => 'https://www.24h.com.vn/upload/rss/tintuctrongngay.rss',    'lang' => 'vi', 'type' => 'news', 'region' => 'north'],
+    ['name' => 'VnExpress',   'url' => 'https://vnexpress.net/rss/tin-moi-nhat.rss',               'lang' => 'vi', 'type' => 'news'],
+    ['name' => 'Tuổi Trẻ',    'url' => 'https://tuoitre.vn/rss/tin-moi-nhat.rss',                  'lang' => 'vi', 'type' => 'news'],
+    ['name' => 'Dân trí',     'url' => 'https://dantri.com.vn/rss/tin-moi-nhat.rss',               'lang' => 'vi', 'type' => 'news'],
+    ['name' => 'Vietnamnet',  'url' => 'https://vietnamnet.vn/rss/tin-moi-nhat.rss',               'lang' => 'vi', 'type' => 'news'],
+    ['name' => 'Thanh Niên',  'url' => 'https://thanhnien.vn/rss/trang-chu.rss',                   'lang' => 'vi', 'type' => 'news'],
+    ['name' => 'Znews',       'url' => 'https://znews.vn/rss/tin-moi-nhat.rss',                   'lang' => 'vi', 'type' => 'news'],
+    ['name' => 'VietNamPlus', 'url' => 'https://www.vietnamplus.vn/rss/tin-moi.rss',               'lang' => 'vi', 'type' => 'news'],
+    ['name' => '24h',         'url' => 'https://www.24h.com.vn/upload/rss/tintuctrongngay.rss',    'lang' => 'vi', 'type' => 'news'],
     ['name' => 'BBC News',    'url' => 'https://feeds.bbci.co.uk/news/world/rss.xml',               'lang' => 'en', 'type' => 'news'],
     ['name' => 'TechCrunch',  'url' => 'https://techcrunch.com/feed/',                              'lang' => 'en', 'type' => 'news'],
     ['name' => 'Reddit',      'url' => 'https://www.reddit.com/r/all/.rss',                         'lang' => 'en', 'type' => 'social'],
     ['name' => 'HN Frontpage','url' => 'https://hnrss.org/frontpage',                               'lang' => 'en', 'type' => 'social'],
 ];
 
-$LOCATION_REGIONS = [
-    'north' => ['hà nội','hải phòng','quảng ninh','thái bình','nam định','hải dương','bắc ninh','bắc giang','hà nam','ninh bình','hưng yên','vĩnh phúc','phú thọ','thái nguyên','tuyên quang','lào cai','yên bái','sơn la','điện biên','hòa bình','lai châu','hà giang','cao bằng','bắc kạn','lạng sơn','quảng ninh'],
-    'south' => ['hồ chí minh','hcm','cần thơ','đồng nai','bình dương','bà rịa','vũng tàu','an giang','kiên giang','cà mau','bạc liêu','sóc trăng','trà vinh','vĩnh long','bến tre','tiền giang','long an','tây ninh','bình phước','đồng tháp','hậu giang'],
-    'central' => ['đà nẵng','huế','khánh hòa','nha trang','đắk lắk','đắk nông','lâm đồng','đà lạt','gia lai','kon tum','bình định','quy nhơn','quảng nam','quảng ngãi','quảng bình','quảng trị','phú yên','bình thuận','ninh thuận','thanh hóa','nghệ an','hà tĩnh'],
-];
+
 
 // ===== CACHE =====
 function get_cached_news() {
@@ -127,35 +123,25 @@ function classify_category($title, $desc) {
 }
 
 // ===== BREAKING NEWS =====
-function score_breaking($art, $user_region = '') {
-    global $RSS_SOURCES;
+function score_breaking($art) {
     $now = time();
     $score = 0;
-    // recency
     $age = ($now - $art['pubDate']) / 3600;
     if ($age < 1) $score += 10;
     elseif ($age < 3) $score += 6;
     elseif ($age < 6) $score += 3;
-    // vietnamese priority
     if (($art['lang'] ?? 'en') === 'vi') $score += 8;
-    if (($art['source'] ?? '') !== '' && in_array($art['source'], ['VnExpress','Tuổi Trẻ','Dân trí','Vietnamnet','Thanh Niên','VietNamPlus','24h','Znews'])) $score += 3;
-    // category boost
-    $boost_cats = ['Chính trị','Thế giới','Kinh doanh'];
-    if (in_array($art['category'] ?? '', $boost_cats)) $score += 4;
-    // title length (short = more breaking)
-    $tlen = mb_strlen($art['title'] ?? '', 'UTF-8');
-    if ($tlen > 0 && $tlen < 60) $score += 2;
-    // has thumbnail
+    if (in_array($art['source'] ?? '', ['VnExpress','Tuổi Trẻ','Dân trí','Vietnamnet','Thanh Niên','VietNamPlus','24h','Znews'])) $score += 3;
+    if (in_array($art['category'] ?? '', ['Chính trị','Thế giới','Kinh doanh'])) $score += 4;
+    if (mb_strlen($art['title'] ?? '', 'UTF-8') > 0 && mb_strlen($art['title'] ?? '', 'UTF-8') < 60) $score += 2;
     if (!empty($art['thumbnail'])) $score += 1;
-    // user region boost — prefer local sources
-    if ($user_region && ($art['region'] ?? '') === $user_region) $score += 5;
     return $score;
 }
 
-function pick_breaking($articles, $count = 10, $user_region = '') {
+function pick_breaking($articles, $count = 10) {
     $scored = [];
     foreach ($articles as $a) {
-        $a['_score'] = score_breaking($a, $user_region);
+        $a['_score'] = score_breaking($a);
         $scored[] = $a;
     }
     usort($scored, fn($a,$b) => $b['_score'] - $a['_score']);
@@ -315,27 +301,6 @@ function fetch_gold_sjc_fallback() {
     return $result;
 }
 
-// ===== REGION DETECTION =====
-function detect_region($user_city) {
-    global $LOCATION_REGIONS;
-    $user_city = mb_strtolower(trim($user_city), 'UTF-8');
-    foreach ($LOCATION_REGIONS as $region => $cities) {
-        foreach ($cities as $c) {
-            if (mb_strpos($user_city, $c) !== false || mb_strpos($c, $user_city) !== false) return $region;
-        }
-    }
-    // Check individual city name parts
-    $parts = preg_split('/[\s,]+/', $user_city);
-    foreach ($parts as $p) {
-        $p = trim($p);
-        if (!$p) continue;
-        foreach ($LOCATION_REGIONS as $region => $cities) {
-            if (in_array($p, $cities)) return $region;
-        }
-    }
-    return '';
-}
-
 // ===== CACHE-ONLY READER (no fetching) =====
 function load_cached_data() {
     global $CACHE_FILE;
@@ -348,22 +313,14 @@ function load_cached_data() {
         'top_keywords'=>[], 'timeline'=>[], 'trends'=>[], 'finance'=>[],
         'source_types'=>[], 'total'=>0, 'updated_at'=>time(),
         'weather'=>[], 'social_trends'=>[], 'world_clocks'=>get_world_clocks(),
-        'user_city'=>'', 'user_region'=>'',
     ];
 }
 
 // ===== MAIN AGGREGATOR (for cron) =====
-function fetch_all_news($user_city = '') {
+function fetch_all_news() {
     global $RSS_SOURCES;
     $cached = get_cached_news();
-    if ($cached) {
-        if ($user_city) {
-            $cached['weather'] = fetch_weather($user_city);
-            $cached['user_city'] = $user_city;
-            $cached['user_region'] = detect_region($user_city);
-        }
-        return $cached;
-    }
+    if ($cached) return $cached;
 
     $all_articles = []; $source_stats = []; $keywords_pool = []; $source_type_map = [];
 
@@ -371,7 +328,7 @@ function fetch_all_news($user_city = '') {
         $articles = fetch_rss($source['url']);
         $source_type_map[$source['name']] = $source['type'];
         foreach ($articles as &$art) {
-            $art['source']=$source['name']; $art['lang']=$source['lang']; $art['type']=$source['type']; $art['region']=$source['region']??'';
+            $art['source']=$source['name']; $art['lang']=$source['lang']; $art['type']=$source['type'];
             $art['category']=classify_category($art['title'],$art['description']);
             $art['id']=md5($art['link']);
             $all_articles[]=$art;
@@ -387,8 +344,7 @@ function fetch_all_news($user_city = '') {
     $category_stats = [];
     foreach ($all_articles as $art) $category_stats[$art['category']]=($category_stats[$art['category']]??0)+1;
 
-    $user_region = detect_region($user_city);
-    $breaking = pick_breaking($all_articles, 12, $user_region);
+    $breaking = pick_breaking($all_articles, 12);
 
     $result = [
         'articles'=>$all_articles, 'breaking'=>$breaking,
@@ -400,11 +356,9 @@ function fetch_all_news($user_city = '') {
         'total'=>count($all_articles), 'updated_at'=>time(),
     ];
 
-    $result['weather'] = fetch_weather($user_city);
+    $result['weather'] = fetch_weather();
     $result['social_trends'] = fetch_social_trends();
     $result['world_clocks'] = get_world_clocks();
-    $result['user_city'] = $user_city;
-    $result['user_region'] = $user_region;
 
     set_cached_news($result);
     return $result;
@@ -421,11 +375,10 @@ function build_timeline($articles) {
 }
 
 // ===== WEATHER =====
-function fetch_weather($user_city = '') {
+function fetch_weather() {
     $cache = __DIR__ . '/../cache/weather_cache.json';
     if (file_exists($cache) && (time()-filemtime($cache))<600) return json_decode(file_get_contents($cache),true);
     $cities = ['Hanoi','Ho+Chi+Minh+City','Da+Nang','Can+Tho'];
-    if ($user_city && !in_array($user_city, $cities)) $cities[] = $user_city;
     $data = [];
     foreach ($cities as $city) {
         $url = "https://wttr.in/{$city}?format=j1";
@@ -436,7 +389,7 @@ function fetch_weather($user_city = '') {
             if ($d && isset($d['current_condition'][0])) {
                 $cc = $d['current_condition'][0];
                 $fc = $d['weather']??[];
-                $entry = [
+                $data[] = [
                     'city' => str_replace(['+','Ho%20Chi%20Minh%20City'],[' ','HCM'],$city),
                     'temp' => $cc['temp_C']??'--',
                     'feels' => $cc['FeelsLikeC']??'--',
@@ -451,8 +404,6 @@ function fetch_weather($user_city = '') {
                         'code'=>$f['hourly'][0]['weatherCode']??'',
                     ], array_slice($fc,0,5)),
                 ];
-                if ($user_city && stripos($entry['city'], str_replace(['+'],' ',$user_city)) !== false) $entry['user_location'] = true;
-                $data[] = $entry;
             }
         }
     }

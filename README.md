@@ -10,11 +10,11 @@ Dashboard tin tức thời gian thực, tối giản, kỹ thuật. Tự động
 - **Phân trang + filter** — lọc theo nguồn, chuyên mục, thời gian, tìm kiếm realtime
 - **6 biểu đồ** — timeline 24h, doughnut chuyên mục, bar từ khoá, polar area, source bar, hourly bar
 - **Tài chính** — VN-INDEX, HNX, giá vàng (SJC/thế giới), dầu Brent/WTI, xăng dầu VN, USD/VND. Có tab lọc theo loại
-- **Thời tiết** — 4 tỉnh lớn + tự động phát hiện vị trí người dùng qua Geolocation API, hiển thị nhiệt độ, độ ẩm, gió, dự báo 4 ngày
+- **Thời tiết** — 4 tỉnh lớn (Hà Nội, HCM, Đà Nẵng, Cần Thơ), hiển thị nhiệt độ, độ ẩm, gió, dự báo 4 ngày
 - **Đồng hồ thế giới** — `worldclock.php` — 20+ múi giờ, cập nhật realtime, phân biệt ngày/đêm
 - **Xu hướng mạng xã hội** — `trends.php` — Google Trends VN, YouTube thịnh hành, TikTok hashtag, Facebook/Threads
 - **Xu hướng Google** — top từ khoá tìm kiếm tại Việt Nam
-- **Định vị khu vực** — tự động phát hiện vị trí → thêm thời tiết thành phố của bạn, ưu tiên tin tức từ nguồn địa phương (Bắc/Nam/Trung)
+
 - **Theme tối** — dark mode duy nhất
 - **Đếm ngược tự động** — countdown đến lần làm mới tiếp theo (60s)
 - **View modes** — `?view=all|news|finance|charts|breaking` — mỗi tab màn hình riêng
@@ -106,8 +106,6 @@ Tất cả endpoint chỉ đọc cache (do cron job tạo), không fetch RSS.
 | `api.php?action=weather` | Chỉ dữ liệu thời tiết |
 | `api.php?action=social` | Chỉ xu hướng mạng xã hội |
 | `api.php?action=clocks` | Chỉ đồng hồ thế giới |
-| Tham số `&location=Hanoi` | Gửi vị trí người dùng để nhận thời tiết + ưu tiên khu vực |
-
 ### Cron job
 
 | Endpoint | Mô tả |

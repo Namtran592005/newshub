@@ -373,8 +373,7 @@ body.page-tv .tv-container{max-width:100%;padding:0;margin:0}
 .weather-fc{text-align:center;font-size:.6rem;color:var(--text-muted);padding:2px 5px;background:var(--bg-secondary);border-radius:3px;flex:1}
 .weather-fc .fc-day{font-weight:600;color:var(--text-secondary)}
 .weather-fc .fc-temp{margin-top:1px}
-.weather-card.user-location{border-color:var(--accent-blue);background:var(--bg-card-hover);position:relative}
-.weather-card.user-location::before{content:'📍';position:absolute;top:-6px;right:-6px;font-size:.7rem;z-index:1}
+
 
 /* ===== WORLD CLOCKS PAGE ===== */
 body.page-clock{background:var(--bg-primary)}

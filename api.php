@@ -6,7 +6,6 @@ header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
 require_once __DIR__ . '/includes/functions.php';
 
 $action = $_GET['action'] ?? 'all';
-$user_city = $_GET['location'] ?? '';
 
 switch ($action) {
     case 'refresh':
@@ -15,8 +14,7 @@ switch ($action) {
         break;
 
     case 'weather':
-        $cached = load_cached_data();
-        $data = ['weather' => $cached['weather']];
+        $data = ['weather' => load_cached_data()['weather']];
         break;
 
     case 'social':
@@ -56,11 +54,6 @@ switch ($action) {
     case 'all':
     default:
         $data = load_cached_data();
-        if ($user_city) {
-            $data['weather'] = fetch_weather($user_city);
-            $data['user_city'] = $user_city;
-            $data['user_region'] = detect_region($user_city);
-        }
         break;
 }
 
