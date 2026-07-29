@@ -327,21 +327,20 @@ function getWeatherIcon(code) {
 
 // ===== USER LOCATION =====
 function detectUserLocation(){
-    if (!navigator.geolocation) { loadDashboard(); return; }
+    // Chỉ chạy geolocation nếu đang HTTPS (trên HTTP các trình duyệt từ chối)
+    if (!navigator.geolocation || location.protocol !== 'https:') return;
     navigator.geolocation.getCurrentPosition(
         pos => {
             const lat=pos.coords.latitude, lng=pos.coords.longitude;
-            // Reverse geocode via free Nominatim API
             fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&accept-language=vi`)
                 .then(r=>r.json())
                 .then(d=>{
                     const addr=d?.address;
                     userCity=addr?.city||addr?.town||addr?.county||addr?.state||'';
-                    loadDashboard();
                 })
-                .catch(()=>loadDashboard());
+                .catch(()=>{});
         },
-        () => loadDashboard(),
+        () => {},
         { timeout: 5000, enableHighAccuracy: false }
     );
 }
@@ -349,6 +348,7 @@ function detectUserLocation(){
 // ===== INIT =====
 document.addEventListener('DOMContentLoaded',()=>{
     detectUserLocation();
+    loadDashboard();
     startCountdown();
     document.querySelector('.btn-refresh')?.addEventListener('click',handleRefresh);
     setInterval(loadDashboard,POLL_INTERVAL);
