@@ -19,7 +19,8 @@
                 <span class="live-dot"></span>
                 <span>TRỰC TIẾP</span>
             </div>
-            <nav class="view-nav">
+            <button class="hamburger" id="hamburger" type="button" title="Menu"><i class="fa-solid fa-bars"></i></button>
+            <nav class="view-nav" id="view-nav">
                 <a href="?view=all" class="view-link <?= $view==='all'?'active':'' ?>" title="Tổng quan"><i class="fa-solid fa-grip"></i></a>
                 <a href="?view=news" class="view-link <?= $view==='news'?'active':'' ?>" title="Tin tức"><i class="fa-regular fa-newspaper"></i></a>
                 <a href="?view=finance" class="view-link <?= $view==='finance'?'active':'' ?>" title="Tài chính"><i class="fa-solid fa-chart-simple"></i></a>
@@ -27,7 +28,7 @@
                 <a href="?view=breaking" class="view-link <?= $view==='breaking'?'active':'' ?>" title="Tin nóng"><i class="fa-solid fa-triangle-exclamation"></i></a>
                 <a href="trends.php" class="view-link" title="Xu hướng MXH" target="_blank"><i class="fa-solid fa-hashtag"></i></a>
                 <a href="worldclock.php" class="view-link" title="Đồng hồ thế giới" target="_blank"><i class="fa-regular fa-clock"></i></a>
-                <a href="tv.php" class="view-link" title="TV Trực tiếp" target="_blank"><i class="fa-solid fa-tv"></i></a>
+                <a href="tv.php" class="view-link" title="Live" target="_blank"><i class="fa-solid fa-tv"></i> Live</a>
             </nav>
         </div>
         <div class="header-right">
@@ -190,5 +191,16 @@
         </div>
     </div>
 </div>
+<footer class="footer">
+    <div class="footer-content">
+        <p class="footer-desc">
+            <strong>NewsHub</strong> — Dashboard tổng hợp tin tức & xu hướng thời gian thực, được cập nhật liên tục từ hơn 12 nguồn RSS trong nước và quốc tế.
+        </p>
+        <p class="footer-author">
+            Phát triển bởi <a href="https://github.com/Namtran592005" target="_blank" rel="noopener">Nam Trần</a>
+            <a href="https://github.com/Namtran592005/newshub" target="_blank" rel="noopener" class="footer-repo" title="GitHub"><i class="fa-brands fa-github"></i></a>
+        </p>
+    </div>
+</footer>
 </body>
 </html>

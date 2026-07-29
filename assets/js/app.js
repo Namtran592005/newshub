@@ -328,5 +328,13 @@ document.addEventListener('DOMContentLoaded',()=>{
     loadDashboard();
     startCountdown();
     document.querySelector('.btn-refresh')?.addEventListener('click',handleRefresh);
+    document.getElementById('hamburger')?.addEventListener('click',()=>{
+        document.getElementById('view-nav')?.classList.toggle('open');
+    });
+    document.addEventListener('click',(e)=>{
+        const nav=document.getElementById('view-nav');
+        const ham=document.getElementById('hamburger');
+        if(nav&&ham&&!nav.contains(e.target)&&!ham.contains(e.target))nav.classList.remove('open');
+    });
     setInterval(loadDashboard,POLL_INTERVAL);
 });

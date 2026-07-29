@@ -422,3 +422,28 @@ body.page-trends{background:var(--bg-primary)}
     .wc-grid{grid-template-columns:1fr}
     .weather-row{grid-template-columns:1fr 1fr}
 }
+
+/* ===== HAMBURGER ===== */
+.hamburger{display:none;background:transparent;border:1px solid var(--border-color);color:var(--text-secondary);padding:6px 10px;border-radius:var(--radius-sm);cursor:pointer;font-size:.9rem;transition:all var(--transition)}
+.hamburger:hover{background:var(--bg-card);color:var(--text-primary);border-color:var(--text-muted)}
+
+@media(max-width:768px){
+    .hamburger{display:flex;align-items:center;gap:6px;font-size:.76rem;margin-left:4px}
+    .hamburger i{font-size:.9rem}
+    .view-nav{display:none;position:absolute;top:100%;left:0;right:0;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:var(--radius);padding:6px;flex-direction:column;gap:2px;z-index:200;margin-left:0;border-left:none;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+    .view-nav.open{display:flex}
+    .view-link{padding:8px 10px;width:100%;justify-content:flex-start;font-size:.8rem}
+    .view-link i{margin-right:8px;width:16px;text-align:center}
+    .header-left{position:relative}
+}
+
+/* ===== FOOTER ===== */
+.footer{margin-top:32px;padding:20px 0;border-top:1px solid var(--border-color)}
+.footer-content{max-width:1440px;margin:0 auto;padding:0 20px;text-align:center}
+.footer-desc{font-size:.75rem;color:var(--text-muted);margin-bottom:8px;max-width:500px;margin-left:auto;margin-right:auto}
+.footer-author{font-size:.78rem;color:var(--text-secondary);display:flex;align-items:center;justify-content:center;gap:8px}
+.footer-author a{color:var(--accent-blue);text-decoration:none;transition:color var(--transition)}
+.footer-author a:hover{color:var(--accent-cyan)}
+.footer-repo{font-size:1.15rem;display:inline-flex;align-items:center}
+.footer-repo i{font-size:1.15rem;color:var(--text-muted);transition:color var(--transition)}
+.footer-repo:hover i{color:var(--text-primary)}
