@@ -124,7 +124,7 @@ $cacheAge = file_exists($cacheDir . '/news_cache.json') ? time() - filemtime($ca
 if ($inDocker) {
     // Check for the while-sleep loop process (cron.php runs briefly each cycle)
     $loop = @shell_exec('ps aux 2>/dev/null | grep -E "(sleep 60|while true)" | grep -v grep');
-    $hasLoop = !empty(trim($loop));
+    $hasLoop = $loop && trim($loop) !== '';
     if ($hasLoop) {
         chk(true, 'Cron loop', 'Đang chạy (sleep 60s)');
     } else {
