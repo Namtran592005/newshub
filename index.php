@@ -17,7 +17,7 @@
             <div class="header-title">NEWSHUB</div>
             <div class="live-indicator">
                 <span class="live-dot"></span>
-                <span>TRỰC TIẾP</span>
+                <span>LIVE</span>
             </div>
             <button class="hamburger" id="hamburger" type="button" title="Menu"><i class="fa-solid fa-bars"></i></button>
             <nav class="view-nav" id="view-nav">
@@ -28,7 +28,7 @@
                 <a href="?view=breaking" class="view-link <?= $view==='breaking'?'active':'' ?>" title="Tin nóng"><i class="fa-solid fa-triangle-exclamation"></i></a>
                 <a href="trends.php" class="view-link" title="Xu hướng MXH" target="_blank"><i class="fa-solid fa-hashtag"></i></a>
                 <a href="worldclock.php" class="view-link" title="Đồng hồ thế giới" target="_blank"><i class="fa-regular fa-clock"></i></a>
-                <a href="tv.php" class="view-link" title="Live" target="_blank"><i class="fa-solid fa-tv"></i> Live</a>
+                <a href="tv.php" class="view-link" title="Live" target="_blank"><i class="fa-solid fa-tv"></i></a>
             </nav>
         </div>
         <div class="header-right">
