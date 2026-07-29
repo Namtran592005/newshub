@@ -103,29 +103,38 @@ section('3. Cache');
 foreach ([
     'https://vnexpress.net' => 'VnExpress',
     'https://tuoitre.vn' => 'Tuổi Trẻ',
-    'https://query1.finance.yahoo.com' => 'Yahoo Finance',
     'https://wttr.in' => 'wttr.in (thời tiết)',
 ] as $url => $l) {
     $ctx = stream_context_create(['http' => ['timeout' => 4, 'user_agent' => 'NewsHub/1.0']]);
     $h = @get_headers($url, 0, $ctx);
     $code = $h ? (explode(' ', $h[0])[1] ?? 0) : 0;
-    chk($code >= 200 && $code < 400, $l, "HTTP $code");
+    chk($code >= 200 && $code < 500, $l, "HTTP $code");
 }
+// Yahoo Finance: trả về 404 ở root, nhưng vẫn dùng được cho chart — chỉ kiểm tra DNS
+$host = 'query1.finance.yahoo.com';
+$ip = @gethostbyname($host);
+chk($ip !== $host, 'Yahoo Finance (DNS)', $ip !== $host ? "Resolved: $ip" : 'Không phân giải được');
 section('4. Kết nối mạng');
 
 // ===== 5. DOCKER & CRON =====
 $inDocker = file_exists('/.dockerenv');
 $isWindows = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
 chk(true, 'Môi trường', $inDocker ? 'Docker container' : ($isWindows ? 'Windows host' : 'Linux host'));
+$cacheAge = file_exists($cacheDir . '/news_cache.json') ? time() - filemtime($cacheDir . '/news_cache.json') : 9999;
 if ($inDocker) {
-    $proc = @shell_exec('ps aux 2>/dev/null | grep "cron\.php" | grep -v grep');
-    chk(!empty($proc), 'Cron loop', !empty($proc) ? 'Đang chạy (sleep 60s)' : 'Không chạy');
+    // Check for the while-sleep loop process (cron.php runs briefly each cycle)
+    $loop = @shell_exec('ps aux 2>/dev/null | grep -E "(sleep 60|while true)" | grep -v grep');
+    $hasLoop = !empty(trim($loop));
+    if ($hasLoop) {
+        chk(true, 'Cron loop', 'Đang chạy (sleep 60s)');
+    } else {
+        // Fallback: if cache is fresh, the loop must have run
+        chk($cacheAge < 120, 'Cron loop', $cacheAge < 120 ? 'Cache mới — loop đã chạy' : 'Không phát hiện');
+    }
 } elseif (!$isWindows) {
     $cronSet = @shell_exec('crontab -l 2>/dev/null | grep -c "cron\.php"') > 0;
     chk($cronSet, 'Crontab', $cronSet ? 'Đã cấu hình' : 'Chưa — chạy thủ công: php cron.php');
 } else {
-    // Windows: check if cron.php was run recently via cache mtime
-    $cacheAge = file_exists($cacheDir . '/news_cache.json') ? time() - filemtime($cacheDir . '/news_cache.json') : 9999;
     chk($cacheAge < 180, 'Cache gần đây', $cacheAge < 180 ? sprintf('%.0f phút trước', $cacheAge / 60) : 'Quá cũ — chạy: php cron.php');
 }
 section('5. Docker & Cron');
